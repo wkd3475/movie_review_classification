@@ -1,3 +1,7 @@
+get_dataset()
+에서 첫 인자로 movie_data.csv의 상대 경로를 넣어주면 됨
+
+
 dataset : {'review', 'label(0 or 1)'}
 
 1. dataset 만들기
