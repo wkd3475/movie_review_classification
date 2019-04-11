@@ -1,10 +1,13 @@
 # -*- coding: cp949 -*-
 import csv
+import pickle
+import os
 from collections import Counter
 
 #movie_data.csv => encoding = 'UTF8'
 
 #데이터 값들이 정제된 상태라고 가정
+
 def get_dataset(file_, encoding_, type_):
     datas = []
     
@@ -29,7 +32,7 @@ def get_dataset(file_, encoding_, type_):
 
     return datas
 
-def get_unigram_voca(datas):
+def get_unigram_voca(datas, num_review):
     corpus = []
     for data in datas:
         for voca in data['review'].split():
@@ -76,8 +79,13 @@ def get_unigram_voca(datas):
             contextlist = [w2i[words[j-k-1]] for k in range(window_size)] + [w2i[words[j+k+1]] for k in range(window_size)]
             train_set.append((w2i[words[j]],[w2i[words[j-1]],w2i[words[j+1]]]))
 
-    return words, freqtable, train_set, w2i, i2w
+    save_data_extract(w2i, i2w, freqtable, train_set, num_review, len(w2i))
+    return w2i, i2w, freqtable, train_set
 
+
+###############################################################
+#review가 하나의 문장으로 저장되어 있는데 이를 단어 단위로 쪼개서 return#
+###############################################################
 def get_splited_reviews(datas, w2i):
     splited_reviews =[]
     i = 0
@@ -90,3 +98,54 @@ def get_splited_reviews(datas, w2i):
         i += 1
 
     return splited_reviews
+
+def save_data_extract(w2i, i2w, freqtable, train_set, num_review, numwords):
+    dir_ = '%d_data_extract_%d' %(num_review, numwords)
+    try:
+        if not os.path.exists(os.path.dirname(dir_)):
+            os.makedirs(os.path.join(dir_))
+    except:
+        pass
+    
+    file_ = open(dir_+'/w2i.pkl', 'wb')
+    pickle.dump(w2i, file_)
+    file_.close()
+
+    file_ = open(dir_+'/i2w.pkl', 'wb')
+    pickle.dump(i2w, file_)
+    file_.close()
+
+    file_ = open(dir_+'/freqtable.pkl', 'wb')
+    pickle.dump(freqtable, file_)
+    file_.close()
+
+    file_ = open(dir_+'/train_set.pkl', 'wb')
+    pickle.dump(train_set, file_)
+    file_.close()
+
+    print("Save data_extract in %s" %(dir_))
+                    
+def load_data_extract(num_review, numwords):
+    dir_ = '%d_data_extract_%d' %(num_review, numwords)
+    try:
+        file_ = open(dir_+'/w2i.pkl', 'rb')
+        w2i = pickle.load(file_)
+        file_.close()
+        
+        file_ = open(dir_+'/i2w.pkl', 'rb')
+        i2w = pickle.load(file_)
+        file_.close()
+        
+        file_ = open(dir_+'/freqtable.pkl', 'rb')
+        freqtable = pickle.load(file_)
+        file_.close()
+        
+        file_ = open(dir_+'/train_set.pkl', 'rb')
+        train_set = pickle.load(file_)
+        file_.close()
+    except:
+        print('There are no (%d)_(%d) files.' %(num_review, numwords))
+        return -1, -1, -1, -1
+
+    print("Load data_extract in %s" %(dir_))
+    return w2i, i2w, freqtable, train_set

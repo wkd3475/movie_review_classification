@@ -82,11 +82,11 @@ def word2vec_trainer(train_seq, numwords, stats, mode="CBOW", dimension=100, lea
     W_out = None
     
     if using_W_files == 0:
-        print("New weight...")
+        print("Init weight random...")
         W_in = torch.randn(numwords, dimension) / (dimension**0.5)
         W_out = torch.randn(numwords, dimension) / (dimension**0.5)
     elif using_W_files == 1:
-        print("Load weight...")
+        print("Use existing weight...")
         try:
             W_in, W_out = load_weight(mode, num_reivew, numwords, dimension)
         except:
@@ -135,7 +135,7 @@ def word2vec_trainer(train_seq, numwords, stats, mode="CBOW", dimension=100, lea
             	avg_loss=sum(losses)/len(losses)
             	print("%d  Loss : %f" %(i, avg_loss,))
             	losses=[]
-
+    
     return W_in, W_out
 
 def sim(testword, word2ind, ind2word, matrix):
@@ -156,16 +156,27 @@ def sim(testword, word2ind, ind2word, matrix):
 def check_file(file_path):
     return os.path.exists(file_path)
 
-def save_weight(W_in, W_out, mode, num_review, numwords, dimension):
-    torch.save(W_in, '%s_W_in_%d_%dx%d.pth' %(mode, num_review, numwords, dimension))
-    torch.save(W_out, '%s_W_out_%d_%dx%d.pth' %(mode, num_review, numwords, dimension))
-
-def load_weight(mode, num_review, numwords, dimension):
+def save_word2vec(W_in, W_out, mode, num_review, numwords, dimension):
+    dir_ = '%d_word2vec_%s_%dx%d' %(num_review, mode, numwords, dimension)
     try:
-        W_in = torch.load('%s_W_in_%d_%dx%d.pth' %(mode, num_review, numwords, dimension))
-        W_out = torch.load('%s_W_out_%d_%dx%d.pth' %(mode, num_review, numwords, dimension))
+        if not os.path.exists(os.path.dirname(dir_)):
+            os.makedirs(os.path.join(dir_))
     except:
-        print('There are no (%s)_(%d)_(%d)x(%d) files.' %(mode, num_review, numwords, dimension))
-        return -1, -1
+        pass
     
+    torch.save(W_in, dir_+'/W_in.pth')
+    torch.save(W_out, dir_+'/W_out.pth')
+
+    print("Save word2vec in %s" %(dir_))
+
+def load_word2vec(num_review, numwords, mode, dimension):
+    dir_ = '%d_word2vec_%s_d_%d' %(num_review, mode, numwords, dimension)
+    try:
+        W_in = torch.load(dir_+'/W_in.pth')
+        W_out = torch.load(dir_+'/W_out.pth')
+    except:
+        print('There are no %d_%s_%dx%d files.' %(num_review, mode, numwords, dimension))
+        return -1, -1
+
+    print("Load word2vec in %s" %(dir_))
     return W_in, W_out
