@@ -77,3 +77,16 @@ def get_unigram_voca(datas):
             train_set.append((w2i[words[j]],[w2i[words[j-1]],w2i[words[j+1]]]))
 
     return words, freqtable, train_set, w2i, i2w
+
+def get_splited_reviews(datas, w2i):
+    splited_reviews =[]
+    i = 0
+    for data in datas:
+        splited_reviews.append({'review':[], 'sentiment':None})
+        for voca in data['review'].split():
+            if not w2i[voca] == None:
+                splited_reviews[i]['review'].append(voca)
+        splited_reviews[i]['sentiment'] = data['sentiment']
+        i += 1
+
+    return splited_reviews
