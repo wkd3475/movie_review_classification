@@ -1,4 +1,6 @@
 import torch
+import os
+import csv
 from random import shuffle
 from collections import Counter
 
@@ -72,14 +74,27 @@ def CBOW(centerWord, contextWords, inputMatrix, outputMatrix):
     return loss, grad_in, grad_out
 
 
-def word2vec_trainer(train_seq, numwords, stats, mode="CBOW", dimension=100, learning_rate=0.0025, epoch=3):
+def word2vec_trainer(train_seq, numwords, stats, mode="CBOW", dimension=100, learning_rate=0.0025, epoch=3, using_W_files = 0, num_review=500):
 # train_seq : list(tuple(int, list(int))
-
+    
 # Xavier initialization of weight matrices
-    W_in = torch.randn(numwords, dimension) / (dimension**0.5)
-    W_out = torch.randn(numwords, dimension) / (dimension**0.5)
-    #W_in.cuda()
-    #W_out.cuda()
+    W_in = None
+    W_out = None
+    
+    if using_W_files == 0:
+        print("New weight...")
+        W_in = torch.randn(numwords, dimension) / (dimension**0.5)
+        W_out = torch.randn(numwords, dimension) / (dimension**0.5)
+    elif using_W_files == 1:
+        print("Load weight...")
+        try:
+            W_in, W_out = load_weight(mode, num_reivew, numwords, dimension)
+        except:
+            print("No weight files...")
+            print("New weight...")
+            W_in = torch.randn(numwords, dimension) / (dimension**0.5)
+            W_out = torch.randn(numwords, dimension) / (dimension**0.5)
+            
     i=0
     losses=[]
 
@@ -137,3 +152,20 @@ def sim(testword, word2ind, ind2word, matrix):
         print(ind2word[ind.item()]+":%.3f"%(val,))
     print("===============================================")
     print()
+
+def check_file(file_path):
+    return os.path.exists(file_path)
+
+def save_weight(W_in, W_out, mode, num_review, numwords, dimension):
+    torch.save(W_in, '%s_W_in_%d_%dx%d.pth' %(mode, num_review, numwords, dimension))
+    torch.save(W_out, '%s_W_out_%d_%dx%d.pth' %(mode, num_review, numwords, dimension))
+
+def load_weight(mode, num_review, numwords, dimension):
+    try:
+        W_in = torch.load('%s_W_in_%d_%dx%d.pth' %(mode, num_review, numwords, dimension))
+        W_out = torch.load('%s_W_out_%d_%dx%d.pth' %(mode, num_review, numwords, dimension))
+    except:
+        print('There are no (%s)_(%d)_(%d)x(%d) files.' %(mode, num_review, numwords, dimension))
+        return -1, -1
+    
+    return W_in, W_out

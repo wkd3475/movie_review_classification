@@ -5,10 +5,10 @@ from collections import Counter
 #movie_data.csv => encoding = 'UTF8'
 
 #데이터 값들이 정제된 상태라고 가정
-def get_dataset(file, encoding_, type_):
+def get_dataset(file_, encoding_, type_):
     datas = []
     
-    f = open(file, 'r', encoding=encoding_)
+    f = open(file_, 'r', encoding=encoding_)
 
     lists = csv.reader(f)
     i = 0

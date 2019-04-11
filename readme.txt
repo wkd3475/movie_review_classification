@@ -18,6 +18,8 @@ dataset : {'review', 'label(0 or 1)'}
 - subsampling
 - fasttext
 
+++ Word2Vec 말고 GloVe의 distributed representation도 있다고함
+
 3. 문장 인코더-디코더
 - RNN
 - bidirectional 인코더 등등
