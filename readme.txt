@@ -40,13 +40,16 @@ splited_dataset : {[r1, r2, r3, ... , rn], 'label(0 or 1)'} *예정*
 (1) review 정제가 필요함
 => <br /> \' () 같이 필요없어보이는 값들은 삭제할 필요가 있음
 
-(2) training set, learning set 나누기
+(2) training set, learning set 나누기 필요함
+
+(3) 문장을 벡터화 하기 위한 준비
+- get_splited_reviews()
 
 2. 전체 review를 이용한 Word2Vec
 다양하게 시도해볼 수 있을 듯
-- basic softmax
+- basic softmax (v)
 - hierarchical softmax
-- negative sampling
+- negative sampling (v)
 - subsampling
 - fasttext
 
