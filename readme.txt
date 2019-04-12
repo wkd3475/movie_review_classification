@@ -1,6 +1,13 @@
 get_dataset()
 에서 첫 인자로 movie_data.csv의 상대 경로를 넣어주면 됨
 
+2019/04/11 AM 12:16
+
+2019/04/12 AM 3:51
+각 단계에서 학습 후에 결과를 파일로 저장을 하도록 수정했음
+num_review(실제 데이터 셋에서 review를 사용한 갯수)를 50, 3000으로 CBOW, SG 각각 학습해둠
+
+
 
 dataset : {'review', 'label(0 or 1)'}
 

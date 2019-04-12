@@ -3,10 +3,10 @@ import get_data as gd
 import word2vec as w2v
 
 #default
-num_review = 3000
+num_review = 50
 
 #num_review에 의해 결정되는 값
-numwords = 71687
+numwords = 4209
 mode = "SG"
 dimension = 64
 
@@ -42,4 +42,4 @@ def CNN():
     print(gd.get_splited_reviews(datas, w2i)[0])
 
 #data_extract()
-#word2vec()
+word2vec()
