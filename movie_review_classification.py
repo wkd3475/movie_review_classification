@@ -2,20 +2,16 @@
 import get_data as gd
 import word2vec as w2v
 
-global num_review
-global numwords
-global mode
-global dimension
-
 #default
-num_review = 50
+num_review = 3000
 
 #num_review에 의해 결정되는 값
-numwords = 4209
-mode = "CBOW"
+numwords = 71687
+mode = "SG"
 dimension = 64
 
 def data_extract():
+    global numwords
     print("1. Start data_extract")
     print('Load review (%d)...' %(num_review))
     datas = gd.get_dataset('../dataset/movie_data.csv', 'UTF8', num_review)
@@ -26,8 +22,6 @@ def word2vec():
     print("\n2. Start word2vec")
     w2i, i2w, freqtable, train_set = gd.load_data_extract(num_review, numwords)
     #Set word2vec variables
-    mode = "CBOW"
-    dimension = 64
 
     print('Training (mode : %s)...' %(mode))
     
@@ -47,5 +41,5 @@ def CNN():
 
     print(gd.get_splited_reviews(datas, w2i)[0])
 
-data_extract()
-word2vec()
+#data_extract()
+#word2vec()
