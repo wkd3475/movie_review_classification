@@ -5,7 +5,6 @@ import word2vec as w2v
 #default
 num_review = 50
 
-#num_review에 의해 결정되는 값
 numwords = 4209
 mode = "SG"
 dimension = 64
