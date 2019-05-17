@@ -2,10 +2,12 @@ import csv
 import pickle
 import torch
 import timeit
+import get_data as gd
 
-DIMEN = 256
+num_review = 20000
+DIMEN = 64
 EPOCH = 3
-RATE = 0.03
+RATE = 0.02
 
 def preprocessing(target):
     translation_table = dict.fromkeys(map(ord, '\\;-:'), "")
@@ -20,8 +22,8 @@ def preprocessing(target):
 def test_bigram_tokenize(data_set, bigram2i):
     result = []
     for list_ in data_set:
-        list_[2] = preprocessing(list_[2].lower())
-        corpus = list_[2].split(' ')
+        list_['review'] = preprocessing(list_['review'].lower())
+        corpus = list_['review'].split(' ')
 
         bigram = []
         for j in range(len(corpus)-1):
@@ -29,28 +31,29 @@ def test_bigram_tokenize(data_set, bigram2i):
             if temp in bigram2i:
                 bigram.append(bigram2i[temp])
         bigram = list(set(bigram))
-        result.append([int(list_[0])-1, bigram, list_[2]])
+        result.append([int(list_['sentiment']), bigram, list_['review']])
     
     return result
 
+#datas = [{review : sentiment}]
 def bigram_tokenize(data_set):
-    news = []
-    #i2class : sentence num -> class
-    i2class = {}
+    reviews = []
+    #data2sentiment : sentence num -> class
+    review2sentiment = {}
 
     s2i = {}
     i2s = {}
     i = 0
     #print("- step1 : making s2i, i2s...")
     for list_ in data_set:
-        list_[2] = preprocessing(list_[2].lower())
-        if list_[2] in s2i:
+        list_['review'] = preprocessing(list_['review'].lower())
+        if list_['review'] in s2i:
             pass
         else:
-            news.append(list_[2])
-            i2class[i] = int(list_[0]) - 1
-            s2i[list_[2]] = i
-            i2s[i] = list_[2]
+            reviews.append(list_['review'])
+            review2sentiment[i] = int(list_['sentiment'])
+            s2i[list_['review']] = i
+            i2s[i] = list_['review']
             i += 1
         
     #bigram list
@@ -62,7 +65,7 @@ def bigram_tokenize(data_set):
     s_bag = {}
 
     #print("- step2 : making bigram, sentence(%d) ..." %(len(news)))
-    for sentence in news:
+    for sentence in reviews:
         corpus = sentence.split(' ')
         s_bag_temp[s2i[sentence]] = []
         for j in range(len(corpus)-1):
@@ -84,7 +87,7 @@ def bigram_tokenize(data_set):
         #b = bigram
         for b in v:
             s_bag[k].append(bigram2i[b])
-    return s2i, i2class, bigram2i, s_bag
+    return s2i, review2sentiment, bigram2i, s_bag
 
 #target = class number
 #inputs = bag of bigram numbers
@@ -153,7 +156,7 @@ def trainer(input_set, bigram2i, s_bag, dimension=64, learning_rate=0.01, epoch=
             else:
                 acc.append(0)
 
-            if i%(50000*epoch) == 0:
+            if i%(1000*epoch) == 0:
                 avg_loss=sum(losses)/len(losses)
                 print("(%d / %d) Loss : %f" %(i, len(input_set) * epoch, avg_loss,))
                 losses = []
@@ -166,24 +169,21 @@ def trainer(input_set, bigram2i, s_bag, dimension=64, learning_rate=0.01, epoch=
     print()
     return W_in, W_out
 
-
+#datas = [{review, sentiment}]
 def main():
     start = timeit.default_timer()
-    train_dic = open('train.csv', mode='r', encoding='utf-8').readlines()
-    test_dic = open('test.csv', mode='r', encoding='utf-8').readlines()
-
-    train_lists = csv.reader(train_dic)
-    test_lists = csv.reader(test_dic)
+    datas = gd.get_dataset('../dataset/movie_data.csv', 'UTF8', num_review)
 
     print("train data : bigram_tokenizing...")
-    s2i, i2class, bigram2i, s_bag = bigram_tokenize(train_lists)
+    s2i, i2class, bigram2i, s_bag = bigram_tokenize(datas)
 
     input_set = []
+    test_lists = []
     for k in s_bag.keys():
         input_set.append([i2class[k], k])
 
     print("test data : bigram_tokenizing...")
-    test_set = test_bigram_tokenize(test_lists, bigram2i)
+    test_set = test_bigram_tokenize(datas, bigram2i)
 
     print()
     print("training...")

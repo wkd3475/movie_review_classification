@@ -1,6 +1,7 @@
 # -*- coding: cp949 -*-
 import get_data as gd
 import word2vec as w2v
+import classification
 
 #default
 num_review = 50
@@ -32,6 +33,10 @@ def word2vec():
     testwords = ["it"]
     for tw in testwords:
     	w2v.sim(tw,w2i,i2w,W_in)
+
+def classification():
+    datas = gd.get_dataset('../dataset/movie_data.csv', 'UTF8', num_review)
+    
 
 
 def CNN():

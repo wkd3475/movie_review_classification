@@ -1,12 +1,9 @@
-# -*- coding: cp949 -*-
 import csv
 import pickle
 import os
 from collections import Counter
 
 #movie_data.csv => encoding = 'UTF8'
-
-#데이터 값들이 정제된 상태라고 가정
 
 def get_dataset(file_, encoding_, type_):
     datas = []
@@ -82,10 +79,6 @@ def get_unigram_voca(datas, num_review):
     save_data_extract(w2i, i2w, freqtable, train_set, num_review, len(w2i))
     return w2i, i2w, freqtable, train_set
 
-
-###############################################################
-#review가 하나의 문장으로 저장되어 있는데 이를 단어 단위로 쪼개서 return#
-###############################################################
 def get_splited_reviews(datas, w2i):
     splited_reviews =[]
     i = 0
